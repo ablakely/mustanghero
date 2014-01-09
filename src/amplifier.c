@@ -5,6 +5,8 @@
 
 void start_amp()
 {
+	mustang_initDriver();
+
 	memset(names, 0x00, 100*32);
 
 	int x;

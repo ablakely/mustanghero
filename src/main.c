@@ -7,15 +7,15 @@ int main(int argc, char *argv[])
 	start_amp();
 
 	struct amp_settings punk;
-	punk.amp_num		= AMERICAN_90S;
-	punk.gain		= 100;
-	punk.volume		= 100;
+	punk.amp_num		= METAL_2000;
+	punk.gain		= 250;
+	punk.volume		= 250;
 	punk.treble		= 100;
 	punk.middle		= 100;
 	punk.bass		= 100;
 	punk.cabinet		= cabCHAMP;
 	punk.noise_gate		= 50;
-	punk.master_vol		= 100;
+	punk.master_vol		= 250;
 	punk.gain2		= 100;
 	punk.presence		= 50;
 	punk.threshold		= 60;
