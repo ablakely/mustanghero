@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-c -I./lib -L/usr/lib/i386-linux-gnu -lusb-1.0
+CFLAGS=-c -I./lib -L/usr/lib/i386-linux-gnu -lusb-1.0 -std=c99
 BINFLAGS=-L/usr/lib/i386-linux-gnu -lusb-1.0
 SRC=./src
 OBJ=./build
