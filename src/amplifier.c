@@ -3,7 +3,7 @@
 #include <mustanghero.h>
 #include <mustang.h>
 
-void start_amp()
+int start_amp()
 {
 	mustang_initDriver();
 
@@ -27,10 +27,12 @@ void start_amp()
 			printf("[Mustang Driver] Error: %d\n", x);
 		}
 
-		return;
+		return -1;
 	}
 	else
 	{
 		printf("[Mustang Driver] Connected to amplifier!\n");
 	}
+
+	return 0;
 }

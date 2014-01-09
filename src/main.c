@@ -4,7 +4,11 @@
 
 int main(int argc, char *argv[])
 {
-	start_amp();
+	if (start_amp() != 0)
+	{
+		printf("\nError connecting to amplifier.  Exiting.\n");
+		return -1;
+	}
 
 	struct amp_settings punk;
 	punk.amp_num		= METAL_2000;

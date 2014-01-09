@@ -489,6 +489,8 @@ int mustang_setEffect(struct fx_pedal_settings value)
 	// Save the current settings
 	memcpy(prev_array[array[DSP]-6], array, LENGTH);
 
+
+	printf("[Mustang Driver] Changing Effect unit settings.\n");
 	return ret;
 }
 
@@ -662,5 +664,7 @@ int mustang_setAmplifier(struct amp_settings value)
 	ret = libusb_interrupt_transfer(amp_hand, 0x01, execute, LENGTH, &recieved, TMOUT);
 	libusb_interrupt_transfer(amp_hand, 0x81, array, LENGTH, &recieved, TMOUT);
 
+
+	printf("[Mustang Driver] Changing Amplifer setting.\n");
 	return ret;
 }
