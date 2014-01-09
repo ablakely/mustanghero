@@ -493,3 +493,174 @@ int mustang_setEffect(struct fx_pedal_settings value)
 }
 
 
+int mustang_setAmplifier(struct amp_settings value)
+{
+	int ret, recieved;
+	unsigned char array[LENGTH] = {
+		0x1c, 0x03, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0xaa, 0xa2, 0x80, 0x63, 0x99, 0x80, 0xb0, 0x00,
+		0x80, 0x80, 0x80, 0x80, 0x07, 0x07, 0x07, 0x05,
+		0x00, 0x07, 0x07, 0x01, 0x00, 0x01, 0x5e, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	};
+
+	array[DSP]	= 0x5;
+	array[GAIN]	= value.gain;
+	array[VOLUME]	= value.volume;
+	array[TREBLE]	= value.treble;
+	array[MIDDLE]	= value.middle;
+	array[BASS]	= value.bass;
+
+	if (value.cabinet > 0x0c)
+	{
+		array[CABINET]	= 0x00;
+	}
+	else
+	{
+		array[CABINET]	= value.cabinet;
+	}
+
+	if (value.noise_gate > 0x05)
+	{
+		array[NOISE_GATE]	= 0x00;
+	}
+	else
+	{
+		array[NOISE_GATE]	= value.noise_gate;
+	}
+
+	array[MASTER_VOL]	= value.master_vol;
+	array[GAIN2]		= value.gain2;
+	array[PRESENCE]		= value.presence;
+
+	if (value.noise_gate == 0x05)
+	{
+		if (value.threshold > 0x09)
+		{
+			array[THRESHOLD]	= 0x00;
+		}
+		else
+		{
+			array[THRESHOLD]	= value.threshold;
+		}
+
+		array[DEPTH] = value.depth;
+	}
+
+	array[BIAS]	= value.bias;
+
+	if (value.sag > 0x02)
+	{
+		array[SAG]	= 0x01;
+	}
+	else
+	{
+		array[SAG]	= value.sag;
+	}
+
+	array[BRIGHTNESS]	= value.brightness?1:0;
+
+	switch (value.amp_num)
+	{
+		case FENDER_57_DELUXE:
+			array[AMPLIFIER]	= 0x67;
+			array[44]		= array[45] = array[46] = 0x01;
+			array[50]		= 0x01;
+			array[54]		= 0x53;
+		break;
+
+		case FENDER_59_BASSMAN:
+			array[AMPLIFIER]	= 0x64;
+			array[44]		= array[45] = array[46] = 0x02;
+			array[50]		= 0x02;
+			array[54]		= 0x67;
+		break;
+
+		case FENDER_57_CHAMP:
+			array[AMPLIFIER]	= 0x7c;
+			array[44]		= array[45] = array[46] = 0x0c;
+			array[50]		= 0x0c;
+			array[54]		= 0x00;
+		break;
+
+		case FENDER_65_DELUXE_REVERB:
+			array[AMPLIFIER]	= 0x53;
+			array[40]		= array[43] = 0x00;
+			array[44]		= array[45] = array[46] = 0x03;
+			array[50]		= 0x03;
+			array[54]		= 0x6a;
+		break;
+
+		case FENDER_65_PRINCETON:
+			array[AMPLIFIER]	= 0x6a;
+			array[44]		= array[45] = array[46] = 0x04;
+			array[50]		= 0x04;
+			array[54]		= 0x61;
+		break;
+
+		case FENDER_65_TWIN_REVERB:
+			array[AMPLIFIER]	= 0x75;
+			array[44]		= array[45] = array[46] = 0x05;
+			array[50]		= 0x05;
+			array[54]		= 0x72;
+		break;
+
+		case FENDER_SUPER_SONIC:
+			array[AMPLIFIER]	= 0x72;
+			array[44]		= array[45] = array[46] = 0x06;
+			array[50]		= 0x06;
+			array[54]		= 0x79;
+		break;
+
+		case BRITISH_60S:
+			array[AMPLIFIER]	= 0x61;
+			array[44]		= array[45] = array[46] = 0x07;
+			array[50]		= 0x07;
+			array[54]		= 0x5e;
+		break;
+
+		case BRITISH_70S:
+			array[AMPLIFIER]	= 0x79;
+			array[44]		= array[45] = array[46] = 0x0b;
+			array[50]		= 0x0b;
+			array[54]		= 0x7c;
+		break;
+
+		case BRITISH_80S:
+			array[AMPLIFIER]	= 0x5e;
+			array[44]		= array[45] = array[46] = 0x0a;
+			array[50]		= 0x0a;
+			array[54]		= 0x6d;
+		break;
+
+		case METAL_2000:
+			array[AMPLIFIER]	= 0x6d;
+			array[44]		= array[45] = array[46] = 0x08;
+			array[50]		= 0x08;
+			array[54]		= 0x75;
+		break;
+	}
+
+	ret = libusb_interrupt_transfer(amp_hand, 0x01, array, LENGTH, &recieved, TMOUT);
+	libusb_interrupt_transfer(amp_hand, 0x81, array, LENGTH, &recieved, TMOUT);
+	ret = libusb_interrupt_transfer(amp_hand, 0x01, execute, LENGTH, &recieved, TMOUT);
+	libusb_interrupt_transfer(amp_hand, 0x81, array, LENGTH, &recieved, TMOUT);
+
+	memset(array, 0x00, LENGTH);
+	array[0]	= 0x1c;
+	array[1]	= 0x03;
+	array[2]	= 0x0d;
+	array[6]	= 0x01;
+	array[7]	= 0x01;
+	array[16]	= value.usb_gain;
+
+	ret = libusb_interrupt_transfer(amp_hand, 0x01, array, LENGTH, &recieved, TMOUT);
+	libusb_interrupt_transfer(amp_hand, 0x81, array, LENGTH, &recieved, TMOUT);
+	ret = libusb_interrupt_transfer(amp_hand, 0x01, execute, LENGTH, &recieved, TMOUT);
+	libusb_interrupt_transfer(amp_hand, 0x81, array, LENGTH, &recieved, TMOUT);
+
+	return ret;
+}

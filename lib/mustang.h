@@ -168,5 +168,5 @@ void mustang_initDriver();
 int  mustang_startAmp(char list[][32], char *name, struct amp_settings *amp_set, struct fx_pedal_settings *effects_set);
 int  mustang_stopAmp();
 int  mustang_setEffect(struct fx_pedal_settings);
-
+int  mustang_setAmplifier(struct amp_settings);
 #endif
